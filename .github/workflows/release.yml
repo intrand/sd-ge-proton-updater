@@ -1,0 +1,60 @@
+---
+name: golang
+
+on:
+  push:
+    tags:
+      - "*" # triggers on all new tags
+
+permissions:
+  contents: write
+  packages: write
+
+jobs:
+  get_info:
+    runs-on: ubuntu-latest
+    env:
+      TZ: UTC0
+    outputs:
+      date: ${{ steps.get_date.outputs.date }}
+      go_version: ${{ steps.get_go_version.outputs.go_version }}
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2
+        with:
+          fetch-depth: 0
+
+      - id: get_date
+        run: echo "::set-output name=date::$(git show -s --format=%cdZ --date=format-local:'%Y-%m-%dT%H:%M:%S')" # eg, 2022-01-28T16:21:36Z
+
+      - id: get_go_version
+        run: echo "::set-output name=go_version::$(grep 'go ' ./go.mod | cut -d' ' -f2)" # eg, 1.17
+
+  goreleaser:
+    needs: [get_info] # both necessary for task deps and for the 'needs' context to be passed with everything needed
+    runs-on: ubuntu-latest
+
+    env:
+      orgrepo: ${{ github.repository }}
+
+    steps:
+      - name: print version being used
+        run: echo ${{ needs.get_info.outputs.go_version }}
+
+      - name: Checkout
+        uses: actions/checkout@v2
+        with:
+          fetch-depth: 0
+
+      - name: setup-go
+        uses: actions/setup-go@v2
+        with:
+          go-version: ${{ needs.get_info.outputs.go_version }}
+
+      - name: goreleaser
+        uses: goreleaser/goreleaser-action@v2
+        with:
+          version: latest
+          args: release --rm-dist
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

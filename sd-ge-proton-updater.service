@@ -1,0 +1,10 @@
+[Unit]
+Description=sd-ge-proton-updater
+
+[Service]
+ExecStart=/home/deck/.sd-ge-proton-updater install
+RemainAfterExit=true
+Type=oneshot
+
+[Install]
+WantedBy=multi-user.target
