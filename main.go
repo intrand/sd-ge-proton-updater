@@ -67,17 +67,16 @@ func main() {
 		os.Exit(1)
 	}
 
-	// Handle updating to a new version
-	log.Print("Attempting update of " + cmdname + "...")
-	update_result, err := doSelfUpdate()
-	if err != nil {
-		log.Println("Couldn't update at this time. Please try again later. Exiting.")
-		os.Exit(1)
-	}
-	if update_result {
-		log.Println("Please run " + cmdname + " again.")
-		os.Exit(0)
-	}
+	// // Handle updating to a new version
+	// log.Print("Attempting update of " + cmdname + "...")
+	// update_result, err := doSelfUpdate()
+	// if err != nil {
+	// 	log.Fatalln("Couldn't update at this time. Please try again later. Exiting.")
+	// }
+	// if update_result {
+	// 	log.Println("Please run " + cmdname + " again.")
+	// 	os.Exit(0)
+	// }
 
 	// parse args
 	args := kingpin.MustParse(app.Parse(os.Args[1:]))
