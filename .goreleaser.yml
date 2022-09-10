@@ -29,19 +29,15 @@ changelog:
       - "^docs:"
       - "^test:"
 release:
-  extra_files:
-    - glob: ./sd-ge-proton-updater.service
   footer: |
     # Installation
     
     Don't panic, this is really simple.
     
     1. Switch to Desktop Mode on your Steam Deck
-    2. Use Chrome or Firefox to download the `sd-ge-proton-updater.service` file below as `/home/deck/.config/systemd/user/sd-ge-proton-updater.service`
-    3. Use Chrome or Firefox to download the `sd-ge-proton-updater` file below as `/home/deck/.sd-ge-proton-updater`
-    4. To start now and at each boot, open Konsole and run: `chmod +x /home/deck/.sd-ge-proton-updater && systemctl --user enable --now sd-ge-proton-updater`
-    5. Wait a little while for it to download, verify and extract the latest installation of GE-Proton from the official GitHub repo. Timing highly depends on Internet connection speed.
-    6. Switch back to Gaming Mode.
+    2. Use Chrome or Firefox to download `sd-ge-proton-updater` and run it.
+    3. Wait a little while for it to download, verify and extract the latest installation of GE-Proton from the official GitHub repo. Timing highly depends on Internet connection speed.
+    4. Switch back to Gaming Mode.
     
     From now on you should be able to set compatibility in an unsupported game's properties (eg, Divinity Original Sin Enhanced Edition) and it should hopefully work much better!
     
