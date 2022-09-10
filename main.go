@@ -23,9 +23,11 @@ var (
 )
 
 const (
-	ProtonGeApiUrl = "https://api.github.com/repos/GloriousEggroll/proton-ge-custom/releases"
-	ProtonGeUrl    = "https://github.com/GloriousEggroll/proton-ge-custom"
-	ProtonPath     = "/home/deck/.steam/root/compatibilitytools.d/"
+	protonGeApiUrl = "https://api.github.com/repos/GloriousEggroll/proton-ge-custom/releases"
+	protonGeUrl    = "https://github.com/GloriousEggroll/proton-ge-custom"
+	protonPath     = "/home/deck/.steam/root/compatibilitytools.d/"
+	systemdPath    = "/home/deck/.config/systemd/user/sd-ge-proton-updater.service"
+	elfPath        = "/home/deck/.sd-ge-proton-updater"
 )
 
 type Version struct {
@@ -78,6 +80,12 @@ func main() {
 	// 	os.Exit(0)
 	// }
 
+	// ensure proper setup
+	err := setup()
+	if err != nil {
+		log.Fatalln(err)
+	}
+
 	// parse args
 	args := kingpin.MustParse(app.Parse(os.Args[1:]))
 
@@ -111,7 +119,7 @@ func main() {
 		latestRelease := releases[0]
 		// latestMinusOneRelease := releases[1]
 
-		latestPath := filepath.Join(ProtonPath, *latestRelease.TagName)
+		latestPath := filepath.Join(protonPath, *latestRelease.TagName)
 
 		exist, err := exists(latestPath)
 		if err != nil {
@@ -165,7 +173,7 @@ func main() {
 			log.Fatalln(err)
 		}
 
-		err = installTarGzAsset(tarballPath, ProtonPath)
+		err = installTarGzAsset(tarballPath, protonPath)
 		if err != nil {
 			log.Fatalln(err)
 		}

@@ -37,7 +37,7 @@ func splitGithubUrl(url string) (owner string, repo string, err error) {
 func getGithubClient() (client *github.Client, org string, repo string, err error) {
 	client = github.NewClient(nil)
 
-	org, repo, err = splitGithubUrl(ProtonGeUrl)
+	org, repo, err = splitGithubUrl(protonGeUrl)
 	if err != nil {
 		return client, org, repo, err
 	}
@@ -48,7 +48,7 @@ func getGithubClient() (client *github.Client, org string, repo string, err erro
 func getLatestReleases(ctx context.Context) (releases []*github.RepositoryRelease, err error) {
 	client := github.NewClient(nil)
 
-	org, repo, err := splitGithubUrl(ProtonGeUrl)
+	org, repo, err := splitGithubUrl(protonGeUrl)
 	if err != nil {
 		return releases, err
 	}
