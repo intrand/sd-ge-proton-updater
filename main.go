@@ -37,6 +37,18 @@ type Version struct {
 	BuiltBy string `json:"builtBy"`
 }
 
+// exists returns whether the given file or directory exists
+func exists(path string) (bool, error) {
+	_, err := os.Stat(path)
+	if err == nil {
+		return true, nil
+	}
+	if os.IsNotExist(err) {
+		return false, nil
+	}
+	return false, err
+}
+
 func mkTempDir(tagName string) (dir string, err error) {
 	dir = os.TempDir() // get tmp dir (usually /tmp)
 	if err != nil {
@@ -127,7 +139,7 @@ func main() {
 		}
 
 		if exist {
-			log.Println("Already exists. Nothing to do. Exiting.")
+			log.Println("Release " + *latestRelease.TagName + " already exists on this console. Nothing to do. Exiting.")
 			os.Exit(0)
 		} // end exists
 

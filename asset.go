@@ -17,18 +17,6 @@ import (
 	"github.com/google/go-github/v47/github"
 )
 
-// exists returns whether the given file or directory exists
-func exists(path string) (bool, error) {
-	_, err := os.Stat(path)
-	if err == nil {
-		return true, nil
-	}
-	if os.IsNotExist(err) {
-		return false, nil
-	}
-	return false, err
-}
-
 func downloadAsset(ctx context.Context, asset *github.ReleaseAsset, path string) (err error) {
 	client, org, repo, err := getGithubClient()
 	if err != nil {
