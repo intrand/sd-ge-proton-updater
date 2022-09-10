@@ -13,21 +13,34 @@ func setupThis() (err error) {
 		return err
 	}
 
+	if thisElf == elfPath { // avoid copying self over self
+		return err
+	}
+
 	// mkdir -p
-	dir, _ := filepath.Split(elfPath)
-	err = os.MkdirAll(dir, 0755)
+	dir, _ := filepath.Split(elfPath) // get directory of ELF
+
+	exist, err := exists(dir) // check if it exists already
 	if err != nil {
 		return err
 	}
 
-	cmd := exec.Command("cp", thisElf, elfPath)
+	if !exist { // create it if it doesn't
+		err = os.MkdirAll(dir, 0700)
+		if err != nil {
+			return err
+		}
+	}
+
+	cmd := exec.Command("/usr/bin/cp", "--force", thisElf, elfPath)
 	err = cmd.Run()
 	if err != nil {
 		return err
 	}
 
+	err = os.Chmod(elfPath, 0700)
 	if err != nil {
-		log.Fatal(err)
+		return err
 	}
 
 	return err
@@ -67,21 +80,19 @@ WantedBy=default.target
 		return err
 	}
 
-	if err != nil {
-		log.Fatal(err)
-	}
-
 	return err
 }
 
 func setup() (err error) {
 	// this binary, but in the correct place
+	log.Println("setting up binary...")
 	err = setupThis()
 	if err != nil {
 		return err
 	}
 
 	// systemd
+	log.Println("setting up systemd...")
 	err = setupSystemd()
 	if err != nil {
 		return err
