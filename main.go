@@ -81,19 +81,19 @@ func main() {
 		os.Exit(1)
 	}
 
-	// // Handle updating to a new version
-	// log.Print("Attempting update of " + cmdname + "...")
-	// update_result, err := doSelfUpdate()
-	// if err != nil {
-	// 	log.Fatalln("Couldn't update at this time. Please try again later. Exiting.")
-	// }
-	// if update_result {
-	// 	log.Println("Please run " + cmdname + " again.")
-	// 	os.Exit(0)
-	// }
+	// Handle updating to a new version
+	log.Print("Attempting update of " + cmdname + "...")
+	update_result, err := doSelfUpdate()
+	if err != nil {
+		log.Fatalln("Couldn't update at this time. Please try again later. Exiting. Error: " + err.Error())
+	}
+	if update_result {
+		log.Println("Please exit and run " + cmdname + " again.")
+		os.Exit(0)
+	}
 
 	// ensure proper setup
-	err := setup()
+	err = setup()
 	if err != nil {
 		log.Fatalln(err)
 	}
