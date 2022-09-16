@@ -52,7 +52,7 @@ jobs:
           go-version: ${{ needs.get_info.outputs.go_version }}
 
       - name: Install deps
-        run: apt-get install -yqq libx11-dev libxcursor-dev libxrandr-dev libxinerama-dev libxi-dev libglx-dev libgl-dev libxxf86vm-dev
+        run: sudo apt-get install -yqq libx11-dev libxcursor-dev libxrandr-dev libxinerama-dev libxi-dev libglx-dev libgl-dev libxxf86vm-dev
 
       - name: goreleaser
         uses: goreleaser/goreleaser-action@v2
