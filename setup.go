@@ -64,12 +64,12 @@ WantedBy=default.target
 
 	// mkdir -p
 	dir, _ := filepath.Split(systemdPath)
-	err = os.MkdirAll(dir, os.ModeDir)
+	err = os.MkdirAll(dir, 0755)
 	if err != nil {
 		return err
 	}
 
-	err = os.WriteFile(systemdPath, []byte(unit), os.ModePerm)
+	err = os.WriteFile(systemdPath, []byte(unit), 0644)
 	if err != nil {
 		return err
 	}

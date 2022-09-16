@@ -62,7 +62,7 @@ func mkTempDir(tagName string) (dir string, err error) {
 	}
 
 	if !exist { // create it if it doesn't
-		err = os.MkdirAll(dir, os.ModeDir)
+		err = os.MkdirAll(dir, 0775)
 		if err != nil {
 			return dir, err
 		}

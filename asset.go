@@ -33,7 +33,7 @@ func downloadAsset(ctx context.Context, asset *github.ReleaseAsset, path string)
 		return err
 	}
 
-	err = os.WriteFile(path, content, os.ModePerm)
+	err = os.WriteFile(path, content, 0644)
 	if err != nil {
 		return err
 	}
