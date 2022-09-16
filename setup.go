@@ -74,7 +74,7 @@ WantedBy=default.target
 		return err
 	}
 
-	cmd := exec.Command("systemctl", "daemon-reload")
+	cmd := exec.Command("systemctl", "--user", "daemon-reload")
 	err = cmd.Run()
 	if err != nil {
 		return err
