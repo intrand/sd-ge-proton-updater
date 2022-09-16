@@ -3,6 +3,8 @@ package main
 import (
 	"context"
 	"errors"
+	"log"
+	"path/filepath"
 	"strings"
 
 	"github.com/google/go-github/v47/github"
@@ -83,4 +85,77 @@ func getLatestReleases(ctx context.Context) (releases []*github.RepositoryReleas
 	}
 
 	return releases, err
+}
+
+func install() (err error) {
+	ctx := context.Background()             // create context
+	releases, err := getLatestReleases(ctx) // get latest stable releases
+	if err != nil {
+		return err
+	}
+
+	latestRelease := releases[0]
+	// latestMinusOneRelease := releases[1]
+
+	latestPath := filepath.Join(protonPath, *latestRelease.TagName)
+
+	exist, err := exists(latestPath)
+	if err != nil {
+		return err
+	}
+
+	if exist {
+		log.Println("Release " + *latestRelease.TagName + " already exists on this console. Nothing to do. Exiting.")
+		return err
+	} // end exists
+
+	var shaAsset *github.ReleaseAsset
+	var tarballAsset *github.ReleaseAsset
+	for _, asset := range latestRelease.Assets {
+		if strings.Contains(*asset.Name, ".sha512sum") {
+			shaAsset = asset
+		}
+		if strings.Contains(*asset.Name, ".tar.gz") {
+			tarballAsset = asset
+		}
+	} // end list of assets
+
+	var naked *github.ReleaseAsset
+	if shaAsset == naked || tarballAsset == naked { // check we got data for both
+		return errors.New("couldn't get enough info about releases. Did something change?")
+	}
+
+	dir, err := mkTempDir(*latestRelease.TagName)
+	if err != nil {
+		return err
+	}
+
+	var shaPath string = filepath.Join(dir, *shaAsset.Name)
+	var tarballPath string = filepath.Join(dir, *tarballAsset.Name)
+
+	// download SHA-512 checksum
+	err = downloadAsset(ctx, shaAsset, shaPath)
+	if err != nil {
+		return err
+	}
+
+	// download GE-Proton tarball distribution
+	err = downloadAsset(ctx, tarballAsset, tarballPath)
+	if err != nil {
+		return err
+	}
+
+	// verify SHA of tarball against SHA-512 checksum file (which is not signed!)
+	err = verifySha(shaPath, tarballPath)
+	if err != nil {
+		return err
+	}
+
+	err = installTarGzAsset(tarballPath, protonPath)
+	if err != nil {
+		return err
+	}
+
+	log.Println("Successfully installed: " + *latestRelease.TagName)
+	return err
 }

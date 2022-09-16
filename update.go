@@ -16,10 +16,12 @@ func doSelfUpdate() (result bool, err error) {
 
 	if latest.Version.Equals(v) {
 		log.Println("Already running the latest version:", version)
+		return false, err
 	} else {
 		log.Println("Successfully updated to latest version: ", latest.Version)
 		log.Println("Release notes:\n", latest.ReleaseNotes)
+		return true, err
 	}
 
-	return true, err
+	// return true, err
 }
