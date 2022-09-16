@@ -111,7 +111,7 @@ func installTarGzAsset(source string, destination string) (err error) {
 
 		switch header.Typeflag {
 		case tar.TypeDir:
-			if err := os.MkdirAll(filePath, 0700); err != nil {
+			if err := os.MkdirAll(filePath, dirModeDeck); err != nil {
 				return err
 			}
 		case tar.TypeReg:

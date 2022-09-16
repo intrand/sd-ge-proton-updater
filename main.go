@@ -23,11 +23,16 @@ var (
 )
 
 const (
-	protonGeApiUrl string = "https://api.github.com/repos/GloriousEggroll/proton-ge-custom/releases"
-	protonGeUrl    string = "https://github.com/GloriousEggroll/proton-ge-custom"
-	protonPath     string = "/home/deck/.steam/root/compatibilitytools.d/"
-	systemdPath    string = "/home/deck/.config/systemd/user/sd-ge-proton-updater.service"
-	elfPath        string = "/home/deck/.sd-ge-proton-updater"
+	protonGeApiUrl string      = "https://api.github.com/repos/GloriousEggroll/proton-ge-custom/releases"
+	protonGeUrl    string      = "https://github.com/GloriousEggroll/proton-ge-custom"
+	protonPath     string      = "/home/deck/.steam/root/compatibilitytools.d/"
+	systemdPath    string      = "/home/deck/.config/systemd/user/sd-ge-proton-updater.service"
+	elfPath        string      = "/home/deck/.sd-ge-proton-updater"
+	regExecMode    os.FileMode = 0755
+	dirMode        os.FileMode = 0755
+	regMode        os.FileMode = 0644
+	dirModeDeck    os.FileMode = 0775
+	regModeDeck    os.FileMode = 0664
 )
 
 type Version struct {
@@ -62,7 +67,7 @@ func mkTempDir(tagName string) (dir string, err error) {
 	}
 
 	if !exist { // create it if it doesn't
-		err = os.MkdirAll(dir, 0775)
+		err = os.MkdirAll(dir, dirMode)
 		if err != nil {
 			return dir, err
 		}

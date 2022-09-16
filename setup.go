@@ -26,7 +26,7 @@ func setupThis() (err error) {
 	}
 
 	if !exist { // create it if it doesn't
-		err = os.MkdirAll(dir, 0700)
+		err = os.MkdirAll(dir, dirMode)
 		if err != nil {
 			return err
 		}
@@ -38,7 +38,7 @@ func setupThis() (err error) {
 		return err
 	}
 
-	err = os.Chmod(elfPath, 0700)
+	err = os.Chmod(elfPath, regExecMode)
 	if err != nil {
 		return err
 	}
@@ -64,12 +64,12 @@ WantedBy=default.target
 
 	// mkdir -p
 	dir, _ := filepath.Split(systemdPath)
-	err = os.MkdirAll(dir, 0755)
+	err = os.MkdirAll(dir, dirMode)
 	if err != nil {
 		return err
 	}
 
-	err = os.WriteFile(systemdPath, []byte(unit), 0644)
+	err = os.WriteFile(systemdPath, []byte(unit), regMode)
 	if err != nil {
 		return err
 	}
