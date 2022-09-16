@@ -90,7 +90,7 @@ WantedBy=default.target
 		return err
 	}
 
-	cmd = exec.Command("systemctl", "--user", "enable", "--now", "sd-ge-proton-updater.service")
+	cmd = exec.Command("systemctl", "--user", "enable", "sd-ge-proton-updater.service")
 	err = cmd.Run()
 	if err != nil {
 		return err
