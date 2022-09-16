@@ -1,7 +1,7 @@
 ---
 env:
   - GO111MODULE=on
-  - CGO_ENABLED=0
+  - CGO_ENABLED=1
 before:
   hooks:
     - go mod tidy
