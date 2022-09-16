@@ -15,19 +15,19 @@ import (
 )
 
 var (
-	version = "" // to be filled in by goreleaser
-	commit  = "" // to be filled in by goreleaser
-	date    = "" // to be filled in by goreleaser
-	builtBy = "" // to be filled in by goreleaser
-	cmdname = filepath.Base(os.Args[0])
+	version string = "" // to be filled in by goreleaser
+	commit  string = "" // to be filled in by goreleaser
+	date    string = "" // to be filled in by goreleaser
+	builtBy string = "" // to be filled in by goreleaser
+	cmdname string = filepath.Base(os.Args[0])
 )
 
 const (
-	protonGeApiUrl = "https://api.github.com/repos/GloriousEggroll/proton-ge-custom/releases"
-	protonGeUrl    = "https://github.com/GloriousEggroll/proton-ge-custom"
-	protonPath     = "/home/deck/.steam/root/compatibilitytools.d/"
-	systemdPath    = "/home/deck/.config/systemd/user/sd-ge-proton-updater.service"
-	elfPath        = "/home/deck/.sd-ge-proton-updater"
+	protonGeApiUrl string = "https://api.github.com/repos/GloriousEggroll/proton-ge-custom/releases"
+	protonGeUrl    string = "https://github.com/GloriousEggroll/proton-ge-custom"
+	protonPath     string = "/home/deck/.steam/root/compatibilitytools.d/"
+	systemdPath    string = "/home/deck/.config/systemd/user/sd-ge-proton-updater.service"
+	elfPath        string = "/home/deck/.sd-ge-proton-updater"
 )
 
 type Version struct {
