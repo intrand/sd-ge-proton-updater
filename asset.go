@@ -1,17 +1,14 @@
 package main
 
 import (
-	"archive/tar"
-	"compress/gzip"
 	"context"
 	"crypto/sha512"
 	"encoding/hex"
 	"errors"
-	"fmt"
 	"io"
 	"net/http"
 	"os"
-	"path/filepath"
+	"os/exec"
 	"strings"
 
 	"github.com/google/go-github/v47/github"
@@ -86,65 +83,10 @@ func installTarGzAsset(source string, destination string) (err error) {
 		return err
 	}
 
-	r, err := os.Open(source)
+	cmd := exec.Command("/usr/bin/tar", "xf", source, "-C", destination)
+	err = cmd.Run()
 	if err != nil {
 		return err
-	}
-
-	uncompressedStream, err := gzip.NewReader(r)
-	if err != nil {
-		return err
-	}
-
-	tarReader := tar.NewReader(uncompressedStream)
-
-	for {
-		header, err := tarReader.Next() // go to next file
-		if err == io.EOF {              // we ran out of files
-			break // stop trying to process anything
-		}
-		if err != nil { // all bad conditions
-			return err
-		}
-
-		filePath := filepath.Join(destination, header.Name)
-
-		switch header.Typeflag {
-		case tar.TypeDir:
-			if err := os.MkdirAll(filePath, dirModeDeck); err != nil {
-				return err
-			}
-		case tar.TypeReg:
-			outFile, err := os.Create(filePath)
-			if err != nil {
-				return err
-			}
-
-			if _, err := io.Copy(outFile, tarReader); err != nil {
-				outFile.Close() // outFile.Close error omitted as Copy error is more interesting at this point
-				return err
-			}
-
-			if err := outFile.Close(); err != nil {
-				return err
-			}
-		case tar.TypeSymlink:
-			base, _ := filepath.Split(filePath)            // get base dir for the link
-			target := filepath.Join(base, header.Linkname) // start in the same directory as symlink, but the filename is the target of the symlink, not the symlink itself
-			err = os.Symlink(target, filePath)
-			if err != nil {
-				return err
-			}
-		case tar.TypeLink:
-			base, _ := filepath.Split(filePath)            // get base dir for the link
-			target := filepath.Join(base, header.Linkname) // start in the same directory as symlink, but the filename is the target of the symlink, not the symlink itself
-			err = os.Link(target, filePath)
-			if err != nil {
-				return err
-			}
-		default:
-			return fmt.Errorf("unknown file type: %s in %s", string(header.Typeflag), filePath)
-		}
 	}
 
 	return err
