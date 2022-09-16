@@ -74,7 +74,23 @@ WantedBy=default.target
 		return err
 	}
 
-	cmd := exec.Command("systemctl", "--user", "enable", "--now", "sd-ge-proton-updater.service")
+	cmd := exec.Command("systemctl", "daemon-reload")
+	err = cmd.Run()
+	if err != nil {
+		return err
+	}
+
+	// handle recursive nature of self-setup
+	thisElf, err := os.Executable()
+	if err != nil {
+		return err
+	}
+
+	if thisElf == elfPath { // avoid recursive starting
+		return err
+	}
+
+	cmd = exec.Command("systemctl", "--user", "enable", "--now", "sd-ge-proton-updater.service")
 	err = cmd.Run()
 	if err != nil {
 		return err
