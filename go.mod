@@ -5,7 +5,7 @@ go 1.19
 require (
 	github.com/AllenDang/giu v0.6.2
 	github.com/blang/semver v3.5.1+incompatible
-	github.com/google/go-github/v47 v47.0.0
+	github.com/google/go-github/v47 v47.1.0
 	github.com/rhysd/go-github-selfupdate v1.2.3
 	gopkg.in/alecthomas/kingpin.v2 v2.2.6
 )
@@ -27,11 +27,11 @@ require (
 	github.com/stretchr/testify v1.8.0 // indirect
 	github.com/tcnksm/go-gitconfig v0.1.2 // indirect
 	github.com/ulikunitz/xz v0.5.10 // indirect
-	golang.org/x/crypto v0.0.0-20220829220503-c86fa9a7ed90 // indirect
+	golang.org/x/crypto v0.0.0-20220919173607-35f4265a4bc0 // indirect
 	golang.org/x/image v0.0.0-20220902085622-e7cb96979f69 // indirect
-	golang.org/x/net v0.0.0-20220909164309-bea034e7d591 // indirect
+	golang.org/x/net v0.0.0-20220921203646-d300de134e69 // indirect
 	golang.org/x/oauth2 v0.0.0-20220909003341-f21342109be1 // indirect
-	golang.org/x/sys v0.0.0-20220915200043-7b5979e65e41 // indirect
+	golang.org/x/sys v0.0.0-20220919091848-fb04ddd9f9c8 // indirect
 	google.golang.org/appengine v1.6.7 // indirect
 	google.golang.org/protobuf v1.28.1 // indirect
 	gopkg.in/eapache/queue.v1 v1.1.0 // indirect

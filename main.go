@@ -4,22 +4,25 @@ import (
 	"log"
 	"os"
 	"path/filepath"
+	"runtime"
 
 	"gopkg.in/alecthomas/kingpin.v2"
 )
 
 var (
-	version string = "" // to be filled in by goreleaser
-	commit  string = "" // to be filled in by goreleaser
-	date    string = "" // to be filled in by goreleaser
-	builtBy string = "" // to be filled in by goreleaser
-	cmdname string = filepath.Base(os.Args[0])
+	version    string = "" // to be filled in by goreleaser
+	commit     string = "" // to be filled in by goreleaser
+	date       string = "" // to be filled in by goreleaser
+	builtBy    string = "" // to be filled in by goreleaser
+	cmdname    string = filepath.Base(os.Args[0])
+	installed  bool   = false
+	protonPath string = "/home/deck/.local/share/Steam/compatibilitytools.d"
+	opsys      string = runtime.GOOS
 )
 
 const (
 	protonGeApiUrl string      = "https://api.github.com/repos/GloriousEggroll/proton-ge-custom/releases"
 	protonGeUrl    string      = "https://github.com/GloriousEggroll/proton-ge-custom"
-	protonPath     string      = "/home/deck/.local/share/Steam/compatibilitytools.d"
 	systemdPath    string      = "/home/deck/.config/systemd/user/sd-ge-proton-updater.service"
 	elfPath        string      = "/home/deck/.sd-ge-proton-updater"
 	regExecMode    os.FileMode = 0755
@@ -30,14 +33,22 @@ const (
 )
 
 func main() {
-	// perform startup tasks
-	err := startup()
+	var err error
+
+	// parse args
+	args := kingpin.MustParse(app.Parse(os.Args[1:]))
+
+	installed, err = isInstalled()
 	if err != nil {
 		log.Fatalln(err)
 	}
 
-	// parse args
-	args := kingpin.MustParse(app.Parse(os.Args[1:]))
+	// operating system check - linux only
+	switch opsys {
+	case "linux":
+	default:
+		log.Fatalln(opsys + " is not supported")
+	}
 
 	// main decision tree
 	switch args { // look for operations at the root of the command
@@ -56,11 +67,29 @@ func main() {
 			log.Fatalln(err)
 		}
 
-	// prune
-	case cmd_prune.FullCommand():
-		err = gui()
+	// uninstall
+	case cmd_uninstall.FullCommand():
+		err = uninstall()
 		if err != nil {
 			log.Fatalln(err)
 		}
+
+	// update
+	case cmd_update.FullCommand():
+		_, err = doSelfUpdate()
+		if err != nil {
+			log.Fatalln(err)
+		}
+
+	// get
+	case cmd_get.FullCommand():
+		err = get()
+		if err != nil {
+			log.Fatalln(err)
+		}
+
+	// gui
+	case cmd_gui.FullCommand():
+		gui()
 	} // end args
 }

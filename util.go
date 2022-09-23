@@ -2,8 +2,30 @@ package main
 
 import (
 	"os"
+	"os/exec"
 	"path/filepath"
 )
+
+func daemonReload() (err error) {
+	cmd := exec.Command("systemctl", "--user", "daemon-reload")
+	err = cmd.Run()
+	if err != nil {
+		return err
+	}
+
+	return err
+}
+
+func isInstalled() (installed bool, err error) {
+	installed = false
+
+	installed, err = exists(elfPath)
+	if err != nil {
+		return false, err
+	}
+
+	return installed, err
+}
 
 // exists returns whether the given file or directory exists
 func exists(path string) (bool, error) {
