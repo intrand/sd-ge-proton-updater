@@ -53,7 +53,8 @@ After=network.target
 
 [Service]
 ExecStartPre=/home/deck/.sd-ge-proton-updater update
-ExecStart=/home/deck/.sd-ge-proton-updater install
+ExecStartPre=/home/deck/.sd-ge-proton-updater install
+ExecStart=/home/deck/.sd-ge-proton-updater get
 RemainAfterExit=true
 Type=oneshot
 Restart=on-failure
