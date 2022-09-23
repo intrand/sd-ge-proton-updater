@@ -68,14 +68,14 @@ func main() {
 		}
 
 	// uninstall
-	case cmd_get.FullCommand():
+	case cmd_uninstall.FullCommand():
 		err = uninstall()
 		if err != nil {
 			log.Fatalln(err)
 		}
 
 	// update
-	case cmd_get.FullCommand():
+	case cmd_update.FullCommand():
 		_, err = doSelfUpdate()
 		if err != nil {
 			log.Fatalln(err)
