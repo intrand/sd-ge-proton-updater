@@ -5,7 +5,6 @@ import (
 	"os"
 	"path/filepath"
 	"runtime"
-	"strconv"
 
 	"gopkg.in/alecthomas/kingpin.v2"
 )
@@ -48,19 +47,7 @@ func main() {
 	switch opsys {
 	case "linux":
 	default:
-		if !*app_test {
-			log.Fatalln(opsys + " is not supported")
-		}
-
-		if opsys == "windows" {
-			protonPath = "/msys64/home/deck/.local/share/Steam/compatibilitytools.d" // FIXME: debug only
-			for i := 14; i < 33; i++ {
-				err = os.MkdirAll(protonPath+"/GE-Proton7-"+strconv.Itoa(i), dirMode)
-				if err != nil {
-					log.Println(err)
-				}
-			}
-		}
+		log.Fatalln(opsys + " is not supported")
 	}
 
 	// main decision tree

@@ -40,11 +40,6 @@ func getInstalledProtons() (err error) {
 	protons = []Proton{}
 	fileNames, err := os.ReadDir(protonPath)
 	if err != nil {
-		// FIXME: debug only
-		if *app_test {
-			fmt.Println(err)
-		}
-
 		return err
 	}
 
@@ -52,11 +47,6 @@ func getInstalledProtons() (err error) {
 		if fileName.Type().IsDir() {
 
 			name := fileName.Name() // simplify
-
-			// FIXME: debug only
-			if *app_test {
-				fmt.Println(name)
-			}
 
 			if !strings.Contains(name, "GE-Proton") {
 				continue
@@ -276,7 +266,7 @@ func loop() {
 	pruneProtonButton := giu.Button("Prune chosen GE-Proton releases").Size(mainButtonWidth, mainButtonHeight).OnClick(togglePruneWindow)
 
 	// buttons we want disabled when we aren't running the real deal
-	if !installed && *app_test == false {
+	if !installed {
 		uninstallButton.Disabled(true)
 		getProtonButton.Disabled(true)
 		pruneProtonButton.Disabled(true)

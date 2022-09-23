@@ -5,10 +5,9 @@ import (
 )
 
 var (
-	app      = kingpin.New("Steam Deck GE-Proton Updater", "Automatically updates GE-Proton on the Steam Deck in the background").Author("intrand")
-	app_test = app.Flag("test", "do not use").Short('t').Hidden().Default("false").Bool() // FOR TESTING ONLY; DO NOT USE!
+	app = kingpin.New("Steam Deck GE-Proton Updater", "Automatically updates GE-Proton on the Steam Deck in the background").Author("intrand")
 
-	cmd_gui = app.Command("gui", "opens the graphical user interface of this tool").Default()
+	cmd_gui = app.Command("gui", "opens the graphical user interface of this tool").Hidden().Default()
 
 	// tool commands
 	cmd_version   = app.Command("version", "Prints version and exits")
