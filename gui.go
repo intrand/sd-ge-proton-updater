@@ -187,6 +187,11 @@ func doInstall() {
 	}
 
 	giu.Msgbox("Info", "Steam Deck GE-Proton Updater successfully installed! It will run when this Steam Deck reboots. See About for more information.")
+
+	installed, err = isInstalled()
+	if err != nil {
+		popupError(err)
+	}
 }
 
 func userMustRelaunch(result giu.DialogResult) {
@@ -215,6 +220,11 @@ func doUninstall(result giu.DialogResult) {
 	if err != nil {
 		popupError(err)
 		return
+	}
+
+	installed, err = isInstalled()
+	if err != nil {
+		popupError(err)
 	}
 }
 

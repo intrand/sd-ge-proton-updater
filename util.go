@@ -17,16 +17,14 @@ func daemonReload() (err error) {
 }
 
 func isInstalled() (installed bool, err error) {
-	thisElf, err := os.Executable()
+	installed = false
+
+	installed, err = exists(elfPath)
 	if err != nil {
 		return false, err
 	}
 
-	if thisElf == elfPath { // already installed
-		return true, err
-	}
-
-	return false, err // assume not installed
+	return installed, err
 }
 
 // exists returns whether the given file or directory exists
