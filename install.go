@@ -2,6 +2,7 @@ package main
 
 import (
 	"log"
+	"os"
 )
 
 func install() (err error) {
@@ -13,12 +14,27 @@ func install() (err error) {
 		log.Println("Couldn't update at this time. Continuing. Here's what happened: " + err.Error())
 	}
 
-	// if updated {
-	// 	log.Println()
-	// }
-
 	// ensure proper setup
 	err = setup()
+	if err != nil {
+		return err
+	}
+
+	return err
+}
+
+func uninstall() (err error) {
+	err = os.Remove(systemdPath)
+	if err != nil {
+		return err
+	}
+
+	err = daemonReload()
+	if err != nil {
+		return err
+	}
+
+	err = os.Remove(elfPath)
 	if err != nil {
 		return err
 	}

@@ -2,8 +2,19 @@ package main
 
 import (
 	"os"
+	"os/exec"
 	"path/filepath"
 )
+
+func daemonReload() (err error) {
+	cmd := exec.Command("systemctl", "--user", "daemon-reload")
+	err = cmd.Run()
+	if err != nil {
+		return err
+	}
+
+	return err
+}
 
 func isInstalled() (installed bool, err error) {
 	thisElf, err := os.Executable()

@@ -74,8 +74,7 @@ WantedBy=default.target
 		return err
 	}
 
-	cmd := exec.Command("systemctl", "--user", "daemon-reload")
-	err = cmd.Run()
+	err = daemonReload()
 	if err != nil {
 		return err
 	}
@@ -90,7 +89,7 @@ WantedBy=default.target
 		return err
 	}
 
-	cmd = exec.Command("systemctl", "--user", "enable", "sd-ge-proton-updater.service")
+	cmd := exec.Command("systemctl", "--user", "enable", "sd-ge-proton-updater.service")
 	err = cmd.Run()
 	if err != nil {
 		return err

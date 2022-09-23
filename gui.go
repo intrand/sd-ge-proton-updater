@@ -214,6 +214,22 @@ func doUpdate() {
 	}
 }
 
+func doUninstall(result giu.DialogResult) {
+	if result == false {
+		return
+	}
+
+	err := uninstall()
+	if err != nil {
+		popupError(err)
+		return
+	}
+}
+
+func promptUninstall() {
+	giu.Msgbox("Info", "Are you positive you want to remove Steam Deck GE-Proton Updater? This will not remove GE-Proton from your Steam Deck.").Buttons(giu.MsgboxButtonsYesNo).ResultCallback(doUninstall)
+}
+
 func popupVersion() {
 	giu.Msgbox("About", "Steam Deck GE-Proton Updater will run at every boot. In order, it will...\n\t1. try to update itself to the latest version,\n\t2. ensure it is configured correctly,\n\t3. attempt to get information about the latest GE-Proton release,\n\t4. install the latest release if you don't already have it.\n\n"+
 		"Version: "+version+"\n"+
@@ -255,8 +271,8 @@ func loop() {
 	aboutButton := giu.Button("About").Size(mainButtonWidth, mainButtonHeight).OnClick(popupVersion)
 	updateButton := giu.Button("Check for updates").Size(mainButtonWidth, mainButtonHeight).OnClick(doUpdate)
 	installButton := giu.Button("Install").Size(mainButtonWidth, mainButtonHeight).OnClick(doInstall)
-	uninstallButton := giu.Button("Uninstall").Size(mainButtonWidth, mainButtonHeight).OnClick(stub)
-	getProtonButton := giu.Button("Get latest GE-Proton release").Size(mainButtonWidth, mainButtonHeight).OnClick(stub)
+	uninstallButton := giu.Button("Uninstall").Size(mainButtonWidth, mainButtonHeight).OnClick(promptUninstall)
+	getProtonButton := giu.Button("Get latest GE-Proton release").Size(mainButtonWidth, mainButtonHeight) //.OnClick(stub)
 	pruneProtonButton := giu.Button("Prune chosen GE-Proton releases").Size(mainButtonWidth, mainButtonHeight).OnClick(togglePruneWindow)
 
 	// buttons we want disabled when we aren't running the real deal
@@ -265,6 +281,8 @@ func loop() {
 		getProtonButton.Disabled(true)
 		pruneProtonButton.Disabled(true)
 	}
+
+	getProtonButton.Disabled(true) // not ready yet
 
 	giu.SingleWindow().Layout(
 		giu.PrepareMsgbox(),
