@@ -5,6 +5,19 @@ import (
 	"path/filepath"
 )
 
+func isInstalled() (installed bool, err error) {
+	thisElf, err := os.Executable()
+	if err != nil {
+		return false, err
+	}
+
+	if thisElf == elfPath { // already installed
+		return true, err
+	}
+
+	return false, err // assume not installed
+}
+
 // exists returns whether the given file or directory exists
 func exists(path string) (bool, error) {
 	_, err := os.Stat(path)

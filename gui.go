@@ -19,16 +19,32 @@ type Proton struct {
 	Minor   int
 }
 
+const (
+	mainWindowWidth      int                   = 600
+	mainWindowHeight     int                   = 600
+	mainButtonWidth      float32               = 280
+	mainButtonHeight     float32               = 150
+	pruneSubButtonWidth  float32               = 100
+	pruneSubButtonHeight float32               = 50
+	mainWindowFlags      giu.MasterWindowFlags = giu.MasterWindowFlagsNotResizable
+	// mainWindowFlags      giu.MasterWindowFlags = giu.MasterWindowFlagsFloating + giu.MasterWindowFlagsNotResizable
+)
+
 var (
-	masterFlags giu.MasterWindowFlags = giu.MasterWindowFlagsFloating + giu.MasterWindowFlagsNotResizable
-	protons     []Proton
-	rows        []*giu.TableRowWidget
+	protons         []Proton
+	rows            []*giu.TableRowWidget
+	showPruneWindow bool = false
 )
 
 func getInstalledProtons() (err error) {
 	protons = []Proton{}
 	fileNames, err := os.ReadDir(protonPath)
 	if err != nil {
+		// FIXME: debug only
+		if *app_test {
+			fmt.Println(err)
+		}
+
 		return err
 	}
 
@@ -36,6 +52,11 @@ func getInstalledProtons() (err error) {
 		if fileName.Type().IsDir() {
 
 			name := fileName.Name() // simplify
+
+			// FIXME: debug only
+			if *app_test {
+				fmt.Println(name)
+			}
 
 			if !strings.Contains(name, "GE-Proton") {
 				continue
@@ -159,26 +180,114 @@ func checkAllExceptLatest() {
 
 }
 
-func loop() {
-	giu.SingleWindow().Layout(
-		giu.Label("Please click the Prune button to PERMANENTLY DELETE the installations checked below.").Wrapped(true),
-		giu.Row(
-			giu.Button("Refresh").OnClick(buildRows).Size(100, 50),
-			giu.Button("Uncheck All").OnClick(uncheckAll).Size(100, 50),
-			giu.Button("Check All").OnClick(checkAllExceptLatest).Size(100, 50),
-			giu.Label("                                     "),
-			giu.Button("Prune").OnClick(prune).Size(100, 50),
-		),
-		giu.Table().Rows(rows...),
+func stub() {}
+
+func togglePruneWindow() {
+	giu.OpenPopup("prune")
+}
+
+func popupError(err error) {
+	giu.Msgbox("Error", err.Error())
+}
+
+func doInstall() {
+	err := install()
+	if err != nil {
+		popupError(err)
+	}
+}
+
+func userMustRelaunch(result giu.DialogResult) {
+	os.Exit(0)
+}
+
+func doUpdate() {
+	res, err := doSelfUpdate()
+	if err != nil {
+		popupError(err)
+	}
+
+	if res {
+		giu.Msgbox("Info", "Update successful! You MUST close Steam Deck GE-Proton Updater and run it again to get the benefits.").ResultCallback(userMustRelaunch)
+	} else {
+		giu.Msgbox("Info", "Already on the latest release of Steam Deck GE-Proton Updater.")
+	}
+}
+
+func popupVersion() {
+	giu.Msgbox("About", "Steam Deck GE-Proton Updater will run at every boot. In order, it will...\n\t1. try to update itself to the latest version,\n\t2. ensure it is configured correctly,\n\t3. attempt to get information about the latest GE-Proton release,\n\t4. install the latest release if you don't already have it.\n\n"+
+		"Version: "+version+"\n"+
+		"Commit: "+commit+"\n"+
+		"Date: "+date+"\n"+
+		"Built By: "+builtBy+"\n",
 	)
 }
 
-func gui() (err error) {
-	masterWindow := giu.NewMasterWindow("Steam Deck GE-Proton Updater", 600, 600, masterFlags)
+func loop() {
+	pruneTable := giu.Table().Size(
+		float32(mainWindowWidth-36),   // fit scrollbar
+		float32(mainWindowHeight-152), // fit other widgets
+	).Columns(
+		giu.TableColumn("Installed GE-Proton version").Flags(
+			giu.TableColumnFlagsWidthStretch + giu.TableColumnFlagsNoDirectResize + giu.TableColumnFlagsNoResize,
+		),
+	).Rows(
+		rows...,
+	)
+
+	prunePopup := giu.PopupModal(
+		"prune",
+	).Flags(
+		giu.WindowFlagsAlwaysAutoResize+giu.WindowFlagsNoMove+giu.WindowFlagsNoTitleBar,
+	).Layout(
+		giu.Row(
+			giu.Button("Refresh").Size(pruneSubButtonWidth, pruneSubButtonHeight).OnClick(buildRows),
+			giu.Button("Uncheck All").Size(pruneSubButtonWidth, pruneSubButtonHeight).OnClick(uncheckAll),
+			giu.Button("Check All").Size(pruneSubButtonWidth, pruneSubButtonHeight).OnClick(checkAllExceptLatest),
+			giu.Label("                                     "),
+			giu.Button("Prune").Size(pruneSubButtonWidth, pruneSubButtonHeight).OnClick(prune),
+		),
+		giu.Label("Please click the Prune button to PERMANENTLY DELETE the installations checked below."),
+		pruneTable,
+		giu.Button("Close").Size(pruneSubButtonWidth, pruneSubButtonHeight).OnClick(giu.CloseCurrentPopup),
+	)
+
+	aboutButton := giu.Button("About").Size(mainButtonWidth, mainButtonHeight).OnClick(popupVersion)
+	updateButton := giu.Button("Check for updates").Size(mainButtonWidth, mainButtonHeight).OnClick(doUpdate)
+	installButton := giu.Button("Install").Size(mainButtonWidth, mainButtonHeight).OnClick(doInstall)
+	uninstallButton := giu.Button("Uninstall").Size(mainButtonWidth, mainButtonHeight).OnClick(stub)
+	getProtonButton := giu.Button("Get latest GE-Proton release").Size(mainButtonWidth, mainButtonHeight).OnClick(stub)
+	pruneProtonButton := giu.Button("Prune chosen GE-Proton releases").Size(mainButtonWidth, mainButtonHeight).OnClick(togglePruneWindow)
+
+	// buttons we want disabled when we aren't running the real deal
+	if !installed && *app_test == false {
+		uninstallButton.Disabled(true)
+		getProtonButton.Disabled(true)
+		pruneProtonButton.Disabled(true)
+	}
+
+	giu.SingleWindow().Layout(
+		giu.PrepareMsgbox(),
+		prunePopup,
+		giu.Row(
+			aboutButton,
+			updateButton,
+		),
+		giu.Row(
+			installButton,
+			uninstallButton,
+		),
+		giu.Row(
+			getProtonButton,
+			pruneProtonButton,
+		),
+	)
+}
+
+func gui() {
+	mainWindow := giu.NewMasterWindow("Steam Deck GE-Proton Updater "+version+" "+commit, mainWindowWidth, mainWindowHeight, mainWindowFlags)
 
 	buildRows()
 
-	masterWindow.Run(loop)
-
-	return err
+	mainWindow.Run(loop)
 }

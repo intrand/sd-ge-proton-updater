@@ -22,6 +22,4 @@ func doSelfUpdate() (result bool, err error) {
 		log.Println("Release notes:\n", latest.ReleaseNotes)
 		return true, err
 	}
-
-	// return true, err
 }
