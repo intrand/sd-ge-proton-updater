@@ -67,6 +67,20 @@ func main() {
 			log.Fatalln(err)
 		}
 
+	// uninstall
+	case cmd_get.FullCommand():
+		err = uninstall()
+		if err != nil {
+			log.Fatalln(err)
+		}
+
+	// update
+	case cmd_get.FullCommand():
+		_, err = doSelfUpdate()
+		if err != nil {
+			log.Fatalln(err)
+		}
+
 	// get
 	case cmd_get.FullCommand():
 		err = get()
