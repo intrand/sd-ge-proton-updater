@@ -1,4 +1,4 @@
-module sd-ge-proton-updater
+module github.com/intrand/sd-ge-proton-updater
 
 go 1.19
 
