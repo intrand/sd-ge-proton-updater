@@ -10,26 +10,30 @@ import (
 )
 
 var (
-	version    string = "" // to be filled in by goreleaser
-	commit     string = "" // to be filled in by goreleaser
-	date       string = "" // to be filled in by goreleaser
-	builtBy    string = "" // to be filled in by goreleaser
-	cmdname    string = filepath.Base(os.Args[0])
-	installed  bool   = false
-	protonPath string = "/home/deck/.local/share/Steam/compatibilitytools.d"
-	opsys      string = runtime.GOOS
+	version      string = "" // to be filled in by goreleaser
+	commit       string = "" // to be filled in by goreleaser
+	date         string = "" // to be filled in by goreleaser
+	builtBy      string = "" // to be filled in by goreleaser
+	cmdname      string = filepath.Base(os.Args[0])
+	installed    bool   = false
+	opsys        string = runtime.GOOS
+	gamesInfoMap map[int]string
 )
 
 const (
-	protonGeApiUrl string      = "https://api.github.com/repos/GloriousEggroll/proton-ge-custom/releases"
-	protonGeUrl    string      = "https://github.com/GloriousEggroll/proton-ge-custom"
-	systemdPath    string      = "/home/deck/.config/systemd/user/sd-ge-proton-updater.service"
-	elfPath        string      = "/home/deck/.sd-ge-proton-updater"
-	regExecMode    os.FileMode = 0755
-	dirMode        os.FileMode = 0755
-	regMode        os.FileMode = 0644
-	dirModeDeck    os.FileMode = 0775
-	regModeDeck    os.FileMode = 0664
+	protonGeApiUrl        string      = "https://api.github.com/repos/GloriousEggroll/proton-ge-custom/releases"
+	protonGeUrl           string      = "https://github.com/GloriousEggroll/proton-ge-custom"
+	systemdPath           string      = "/home/deck/.config/systemd/user/sd-ge-proton-updater.service"
+	elfPath               string      = "/home/deck/.sd-ge-proton-updater"
+	protonPath            string      = "/home/deck/.local/share/Steam/compatibilitytools.d"
+	vdfPathConfig         string      = "/home/deck/.local/share/Steam/config/config.vdf"
+	vdfPathLibraryFolders string      = "/home/deck/.local/share/Steam/config/libraryfolders.vdf"
+	regExecMode           os.FileMode = 0755
+	dirMode               os.FileMode = 0755
+	regMode               os.FileMode = 0644
+	dirModeDeck           os.FileMode = 0775
+	regModeDeck           os.FileMode = 0664
+	// vdfPathAppInfo string = "/home/deck/.local/share/Steam/appcache/appinfo.vdf" // FIXME: VDF binary parser and patcher needed before this is useful
 )
 
 func main() {
@@ -48,6 +52,11 @@ func main() {
 	case "linux":
 	default:
 		log.Fatalln(opsys + " is not supported")
+	}
+
+	gamesInfoMap, err = getAllSteamAppsInfo() // this should only happen one time per run
+	if err != nil {
+		log.Fatalln(err)
 	}
 
 	// main decision tree

@@ -13,8 +13,14 @@ func setupThis() (err error) {
 		return err
 	}
 
-	if thisElf == elfPath { // avoid copying self over self
-		return err
+	// avoid copying self over self
+	if thisElf == elfPath {
+		err = os.Chmod(elfPath, regExecMode) // still make sure we're executable!
+		if err != nil {
+			return err // shouldn't be a problem since we're already running :)
+		}
+
+		return err // stop further processing
 	}
 
 	// mkdir -p
@@ -38,6 +44,7 @@ func setupThis() (err error) {
 		return err
 	}
 
+	// ensure executable
 	err = os.Chmod(elfPath, regExecMode)
 	if err != nil {
 		return err
