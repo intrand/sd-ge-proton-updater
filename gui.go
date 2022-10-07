@@ -118,6 +118,7 @@ func uncheckLatest() []Proton {
 func buildRows() {
 	err := getInstalledProtons()
 	if err != nil {
+		popupError(err)
 		return
 	}
 
@@ -139,15 +140,26 @@ func buildRows() {
 func buildGamesRows() {
 	games, err := getSteamGames()
 	if err != nil {
+		popupError(err)
 		return
 	}
 
 	gamesRows = make([]*giu.TableRowWidget, len(games))
 	for i, game := range games {
+		installed := "Not currently installed"
+		if len(game.Path) > 0 {
+			if strings.Contains(game.Path, "/run/media") {
+				installed = "microSD card"
+			}
+			if strings.Contains(game.Path, ".local/share") {
+				installed = "internal SSD"
+			}
+		}
 		gamesRows[i] = giu.TableRow(
 			giu.Label(strconv.Itoa(game.Id)),
 			giu.Label(game.Name),
 			giu.Label(game.CompatibilityTool),
+			giu.Label(installed),
 		)
 	}
 }
@@ -204,6 +216,7 @@ func doInstall() {
 	err := install()
 	if err != nil {
 		popupError(err)
+		return
 	}
 
 	giu.Msgbox("Info", "Steam Deck GE-Proton Updater successfully installed! It will run when this Steam Deck reboots. See About for more information.")
@@ -211,6 +224,7 @@ func doInstall() {
 	installed, err = isInstalled()
 	if err != nil {
 		popupError(err)
+		return
 	}
 }
 
@@ -222,6 +236,7 @@ func doUpdate() {
 	res, err := doSelfUpdate()
 	if err != nil {
 		popupError(err)
+		return
 	}
 
 	if res {
@@ -245,6 +260,7 @@ func doUninstall(result giu.DialogResult) {
 	installed, err = isInstalled()
 	if err != nil {
 		popupError(err)
+		return
 	}
 }
 
@@ -263,8 +279,8 @@ func popupVersion() {
 
 func buildGamesPopup() *giu.PopupModalWidget {
 	gamesTable := giu.Table().Size(
-		float32(mainWindowWidth-36),   // fit scrollbar
-		float32(mainWindowHeight-112), // fit other widgets
+		float32(mainWindowWidth-26),   // fit scrollbar
+		float32(mainWindowHeight-102), // fit other widgets
 	).Flags(
 		giu.TableFlagsSortable,
 	).Columns(
@@ -275,7 +291,10 @@ func buildGamesPopup() *giu.PopupModalWidget {
 			giu.TableColumnFlagsWidthStretch+giu.TableColumnFlagsNoDirectResize+giu.TableColumnFlagsNoResize+giu.TableColumnFlagsNoSort,
 		),
 		giu.TableColumn("Compatibility Tool").Flags(
-			giu.TableColumnFlagsWidthStretch+giu.TableColumnFlagsNoDirectResize+giu.TableColumnFlagsNoResize+giu.TableColumnFlagsNoSort,
+			giu.TableColumnFlagsNoDirectResize+giu.TableColumnFlagsNoResize+giu.TableColumnFlagsNoSort,
+		),
+		giu.TableColumn("Installed").Flags(
+			giu.TableColumnFlagsNoDirectResize+giu.TableColumnFlagsNoResize+giu.TableColumnFlagsNoSort,
 		),
 	).Rows(
 		gamesRows...,
@@ -327,24 +346,28 @@ func buildPrunePopup() *giu.PopupModalWidget {
 	)
 }
 
+func getLatestGeProtonRelease() {
+	err := get()
+	if err != nil {
+		popupError(err)
+		return
+	}
+}
+
 func loop() {
 
 	aboutButton := giu.Button("About").Size(mainButtonWidth, mainButtonHeight).OnClick(popupVersion)
 	updateButton := giu.Button("Check for updates").Size(mainButtonWidth, mainButtonHeight).OnClick(doUpdate)
 	installButton := giu.Button("Install").Size(mainButtonWidth, mainButtonHeight).OnClick(doInstall)
 	uninstallButton := giu.Button("Uninstall").Size(mainButtonWidth, mainButtonHeight).OnClick(promptUninstall)
-	getProtonButton := giu.Button("Get latest GE-Proton release").Size(mainButtonWidth, mainButtonHeight) //.OnClick(stub)
+	getProtonButton := giu.Button("Get latest GE-Proton release").Size(mainButtonWidth, mainButtonHeight).OnClick(getLatestGeProtonRelease)
 	pruneProtonButton := giu.Button("Prune chosen GE-Proton releases").Size(mainButtonWidth, mainButtonHeight).OnClick(togglePruneWindow)
 	listGamesButton := giu.Button("Show list of games").Size(mainButtonWidth, mainButtonHeight).OnClick(toggleGamesWindow)
 
 	// buttons we want disabled when we aren't running the real deal
 	if !installed {
 		uninstallButton.Disabled(true)
-		getProtonButton.Disabled(true)
-		pruneProtonButton.Disabled(true)
 	}
-
-	getProtonButton.Disabled(true) // not ready yet
 
 	giu.SingleWindow().Layout(
 		giu.PrepareMsgbox(),
