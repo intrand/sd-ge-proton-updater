@@ -33,6 +33,7 @@ const (
 var (
 	protons         []Proton
 	rows            []*giu.TableRowWidget
+	gamesRows       []*giu.TableRowWidget
 	showPruneWindow bool = false
 )
 
@@ -135,6 +136,22 @@ func buildRows() {
 	}
 }
 
+func buildGamesRows() {
+	games, err := getSteamGames()
+	if err != nil {
+		return
+	}
+
+	gamesRows = make([]*giu.TableRowWidget, len(games))
+	for i, game := range games {
+		gamesRows[i] = giu.TableRow(
+			giu.Label(strconv.Itoa(game.Id)),
+			giu.Label(game.Name),
+			giu.Label(game.CompatibilityTool),
+		)
+	}
+}
+
 func prune() {
 	for _, proton := range protons {
 		if !proton.Checked {
@@ -167,13 +184,16 @@ func checkAllExceptLatest() {
 			protons[i].Checked = true
 		}
 	}
-
 }
 
 func stub() {}
 
 func togglePruneWindow() {
 	giu.OpenPopup("prune")
+}
+
+func toggleGamesWindow() {
+	giu.OpenPopup("games")
 }
 
 func popupError(err error) {
@@ -241,7 +261,43 @@ func popupVersion() {
 	)
 }
 
-func loop() {
+func buildGamesPopup() *giu.PopupModalWidget {
+	gamesTable := giu.Table().Size(
+		float32(mainWindowWidth-36),   // fit scrollbar
+		float32(mainWindowHeight-112), // fit other widgets
+	).Flags(
+		giu.TableFlagsSortable,
+	).Columns(
+		giu.TableColumn("App ID").Flags(
+			giu.TableColumnFlagsNoDirectResize+giu.TableColumnFlagsNoResize+giu.TableColumnFlagsNoSort,
+		),
+		giu.TableColumn("App Name").Flags(
+			giu.TableColumnFlagsWidthStretch+giu.TableColumnFlagsNoDirectResize+giu.TableColumnFlagsNoResize+giu.TableColumnFlagsNoSort,
+		),
+		giu.TableColumn("Compatibility Tool").Flags(
+			giu.TableColumnFlagsWidthStretch+giu.TableColumnFlagsNoDirectResize+giu.TableColumnFlagsNoResize+giu.TableColumnFlagsNoSort,
+		),
+	).Rows(
+		gamesRows...,
+	)
+
+	return giu.PopupModal(
+		"games",
+	).Flags(
+		giu.WindowFlagsAlwaysAutoResize+giu.WindowFlagsNoMove+giu.WindowFlagsNoTitleBar,
+	).Layout(
+		giu.Row(
+			giu.Button("Refresh").Size(pruneSubButtonWidth, pruneSubButtonHeight).OnClick(buildGamesRows),
+			giu.Button("Close").Size(pruneSubButtonWidth, pruneSubButtonHeight).OnClick(giu.CloseCurrentPopup),
+		),
+		giu.Row(
+			giu.Label("Games using Proton, and what version of Proton each is set to use:"),
+		),
+		gamesTable,
+	)
+}
+
+func buildPrunePopup() *giu.PopupModalWidget {
 	pruneTable := giu.Table().Size(
 		float32(mainWindowWidth-36),   // fit scrollbar
 		float32(mainWindowHeight-152), // fit other widgets
@@ -253,7 +309,7 @@ func loop() {
 		rows...,
 	)
 
-	prunePopup := giu.PopupModal(
+	return giu.PopupModal(
 		"prune",
 	).Flags(
 		giu.WindowFlagsAlwaysAutoResize+giu.WindowFlagsNoMove+giu.WindowFlagsNoTitleBar,
@@ -269,6 +325,9 @@ func loop() {
 		pruneTable,
 		giu.Button("Close").Size(pruneSubButtonWidth, pruneSubButtonHeight).OnClick(giu.CloseCurrentPopup),
 	)
+}
+
+func loop() {
 
 	aboutButton := giu.Button("About").Size(mainButtonWidth, mainButtonHeight).OnClick(popupVersion)
 	updateButton := giu.Button("Check for updates").Size(mainButtonWidth, mainButtonHeight).OnClick(doUpdate)
@@ -276,6 +335,7 @@ func loop() {
 	uninstallButton := giu.Button("Uninstall").Size(mainButtonWidth, mainButtonHeight).OnClick(promptUninstall)
 	getProtonButton := giu.Button("Get latest GE-Proton release").Size(mainButtonWidth, mainButtonHeight) //.OnClick(stub)
 	pruneProtonButton := giu.Button("Prune chosen GE-Proton releases").Size(mainButtonWidth, mainButtonHeight).OnClick(togglePruneWindow)
+	listGamesButton := giu.Button("Show list of games").Size(mainButtonWidth, mainButtonHeight).OnClick(toggleGamesWindow)
 
 	// buttons we want disabled when we aren't running the real deal
 	if !installed {
@@ -288,7 +348,8 @@ func loop() {
 
 	giu.SingleWindow().Layout(
 		giu.PrepareMsgbox(),
-		prunePopup,
+		buildPrunePopup(),
+		buildGamesPopup(),
 		giu.Row(
 			aboutButton,
 			updateButton,
@@ -301,6 +362,9 @@ func loop() {
 			getProtonButton,
 			pruneProtonButton,
 		),
+		giu.Row(
+			listGamesButton,
+		),
 	)
 }
 
@@ -308,6 +372,7 @@ func gui() {
 	mainWindow := giu.NewMasterWindow("Steam Deck GE-Proton Updater "+version+" "+commit, mainWindowWidth, mainWindowHeight, mainWindowFlags)
 
 	buildRows()
+	buildGamesRows()
 
 	mainWindow.Run(loop)
 }
