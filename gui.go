@@ -118,7 +118,6 @@ func uncheckLatest() []Proton {
 func buildRows() {
 	err := getInstalledProtons()
 	if err != nil {
-		popupError(err)
 		return
 	}
 
@@ -140,7 +139,6 @@ func buildRows() {
 func buildGamesRows() {
 	games, err := getSteamGames()
 	if err != nil {
-		popupError(err)
 		return
 	}
 
