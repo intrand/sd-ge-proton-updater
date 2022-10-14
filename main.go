@@ -56,7 +56,7 @@ func main() {
 
 	gamesInfoMap, err = getAllSteamAppsInfo() // this should only happen one time per run
 	if err != nil {
-		log.Fatalln(err)
+		log.Println(err) // don't bail because of this
 	}
 
 	// main decision tree
