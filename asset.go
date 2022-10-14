@@ -83,6 +83,19 @@ func installTarGzAsset(source string, destination string) (err error) {
 		return err
 	}
 
+	exist, err := exists(destination) // check if destination exists already
+	if err != nil {
+		return err
+	}
+
+	if !exist { // create destination if it doesn't
+		err = os.MkdirAll(destination, dirMode)
+		if err != nil {
+			return err
+		}
+	}
+
+	// use system `tar` to extract (cleanly handles symlinks, hardlinks, permissions, etc)
 	cmd := exec.Command("/usr/bin/tar", "xf", source, "-C", destination)
 	err = cmd.Run()
 	if err != nil {
