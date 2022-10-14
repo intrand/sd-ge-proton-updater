@@ -15,7 +15,7 @@ builds:
     ldflags:
       - "-s -w -X 'main.version={{.Version}}' -X 'main.commit={{.Commit}}' -X 'main.date={{ .CommitDate }}' -X 'main.builtBy=github.com/goreleaser/goreleaser-action'"
 archives:
-  - name_template: "{{ .ProjectName }}"
+  - name_template: "{{ .ProjectName }}_{{ .Os }}_{{ .Arch }}{{ if .Arm }}v{{ .Arm }}{{ end }}"
     id: binary
     format: binary
 checksum:
@@ -35,7 +35,7 @@ release:
     Don't panic, this is really simple.
     
     1. Switch to Desktop Mode on your Steam Deck.
-    2. Use Chrome or Firefox to download `sd-ge-proton-updater` and run it.
+    2. Use Chrome or Firefox to download `sd-ge-proton-updater_linux_amd64` and run it.
     3. Click Install.
     3. Reboot your Steam Deck.
     4. Wait a little while for it to download, verify and extract the latest installation of GE-Proton from the official GitHub repo. Timing highly depends on Internet connection speed.
