@@ -1,5 +1,5 @@
 ---
-name: golang
+name: golang_on_deck
 
 on:
   push:
