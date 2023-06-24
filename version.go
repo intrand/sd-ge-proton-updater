@@ -26,8 +26,6 @@ func showVersion() (err error) {
 	}
 
 	fmt.Println(string(versionBytes))
-	// fmt.Println(
-	// 	"{\"version\":\"" + version + "\",\"commit\":\"" + commit + "\",\"date\":\"" + date + "\",\"built_by\":\"" + builtBy + "\"}")
 
 	return err
 }

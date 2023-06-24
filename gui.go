@@ -17,13 +17,15 @@ type Proton struct {
 	Name    string
 	Major   int
 	Minor   int
+	Used    bool
 }
 
 const (
-	mainWindowWidth      int                   = 600
-	mainWindowHeight     int                   = 600
-	mainButtonWidth      float32               = 280
-	mainButtonHeight     float32               = 150
+	mainWindowWidth      int                   = 692
+	mainWindowHeight     int                   = 325
+	mainButtonWidth      float32               = 220
+	mainButtonFullWidth  float32               = 676
+	mainButtonHeight     float32               = 100
 	pruneSubButtonWidth  float32               = 100
 	pruneSubButtonHeight float32               = 50
 	mainWindowFlags      giu.MasterWindowFlags = giu.MasterWindowFlagsNotResizable
@@ -115,13 +117,37 @@ func uncheckLatest() []Proton {
 	return protons
 }
 
+func uncheckUsed() []Proton {
+	for i, proton := range protons {
+		if proton.Used {
+			protons[i].Checked = false
+		}
+	}
+
+	return protons
+}
+
 func buildRows() {
 	err := getInstalledProtons()
 	if err != nil {
 		return
 	}
 
+	games, err := getSteamGames()
+	if err != nil {
+		return
+	}
+
+	for i, proton := range protons {
+		for _, game := range games {
+			if game.CompatibilityTool == proton.Name {
+				protons[i].Used = true
+			}
+		}
+	}
+
 	protons = uncheckLatest()
+	protons = uncheckUsed()
 
 	protonBoxes := []giu.Widget{}
 	for i, proton := range protons {
@@ -132,6 +158,7 @@ func buildRows() {
 	for i := range rows {
 		rows[i] = giu.TableRow(
 			protonBoxes[i],
+			giu.Label(strconv.FormatBool(protons[i].Used)),
 		)
 	}
 }
@@ -320,7 +347,10 @@ func buildPrunePopup() *giu.PopupModalWidget {
 		float32(mainWindowHeight-152), // fit other widgets
 	).Columns(
 		giu.TableColumn("Installed GE-Proton version").Flags(
-			giu.TableColumnFlagsWidthStretch + giu.TableColumnFlagsNoDirectResize + giu.TableColumnFlagsNoResize,
+			giu.TableColumnFlagsWidthStretch+giu.TableColumnFlagsNoDirectResize+giu.TableColumnFlagsNoResize,
+		),
+		giu.TableColumn("In-use").Flags(
+			giu.TableColumnFlagsNoDirectResize+giu.TableColumnFlagsNoResize,
 		),
 	).Rows(
 		rows...,
@@ -353,11 +383,10 @@ func getLatestGeProtonRelease() {
 }
 
 func loop() {
-
-	aboutButton := giu.Button("About").Size(mainButtonWidth, mainButtonHeight).OnClick(popupVersion)
-	updateButton := giu.Button("Check for updates").Size(mainButtonWidth, mainButtonHeight).OnClick(doUpdate)
-	installButton := giu.Button("Install").Size(mainButtonWidth, mainButtonHeight).OnClick(doInstall)
-	uninstallButton := giu.Button("Uninstall").Size(mainButtonWidth, mainButtonHeight).OnClick(promptUninstall)
+	aboutButton := giu.Button("About Steam Deck GE-Proton Updater").Size(mainButtonFullWidth, mainButtonHeight).OnClick(popupVersion)
+	updateButton := giu.Button("Update Steam Deck\nGE-Proton Updater").Size(mainButtonWidth, mainButtonHeight).OnClick(doUpdate)
+	installButton := giu.Button("Install Steam Deck\nGE-Proton Updater").Size(mainButtonWidth, mainButtonHeight).OnClick(doInstall)
+	uninstallButton := giu.Button("Uninstall Steam Deck\nGE-Proton Updater").Size(mainButtonWidth, mainButtonHeight).OnClick(promptUninstall)
 	getProtonButton := giu.Button("Get latest GE-Proton release").Size(mainButtonWidth, mainButtonHeight).OnClick(getLatestGeProtonRelease)
 	pruneProtonButton := giu.Button("Prune chosen GE-Proton releases").Size(mainButtonWidth, mainButtonHeight).OnClick(togglePruneWindow)
 	listGamesButton := giu.Button("Show list of games").Size(mainButtonWidth, mainButtonHeight).OnClick(toggleGamesWindow)
@@ -373,17 +402,15 @@ func loop() {
 		buildGamesPopup(),
 		giu.Row(
 			aboutButton,
-			updateButton,
 		),
 		giu.Row(
 			installButton,
 			uninstallButton,
+			updateButton,
 		),
 		giu.Row(
 			getProtonButton,
 			pruneProtonButton,
-		),
-		giu.Row(
 			listGamesButton,
 		),
 	)
