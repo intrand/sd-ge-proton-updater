@@ -15,7 +15,9 @@ apt-get install -yqq \
     libgl-dev \
     libxxf86vm-dev &&
 
-go build -v -ldflags "-s -w -X 'main.version=0.0.0' -X 'main.commit=dev' -X 'main.date=$(date '+%Y-%m-%d %H:%M:%S')' -X 'main.builtBy=manual'" .
+git config --global --add safe.directory "${PWD}" &&
+
+go build -v -ldflags "-s -w -X 'main.version=0.0.0' -X 'main.commit=dev' -X 'main.date=$(date '+%Y-%m-%d %H:%M:%S')' -X 'main.builtBy=manual'" .;
 
 exit ${?}
 
