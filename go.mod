@@ -29,7 +29,7 @@ require (
 	github.com/ulikunitz/xz v0.5.12 // indirect
 	github.com/xhit/go-str2duration/v2 v2.1.0 // indirect
 	golang.org/x/crypto v0.24.0 // indirect
-	golang.org/x/image v0.17.0 // indirect
+	golang.org/x/image v0.18.0 // indirect
 	golang.org/x/oauth2 v0.21.0 // indirect
 	golang.org/x/sys v0.21.0 // indirect
 	gopkg.in/eapache/queue.v1 v1.1.0 // indirect
