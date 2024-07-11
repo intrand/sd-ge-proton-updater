@@ -1,7 +1,8 @@
 #!/bin/bash
 
 if [ ! -f "/.dockerenv" ]; then
-    docker pull golang:latest && docker run -ti --rm -v "${PWD}":"${PWD}" --workdir "${PWD}" golang:latest
+    docker pull golang:latest && docker run -ti --rm -v "${PWD}":"${PWD}" --workdir "${PWD}" golang:latest;
+    exit;
 fi;
 
 apt-get update &&
