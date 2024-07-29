@@ -12,15 +12,16 @@ require (
 )
 
 require (
-	github.com/AllenDang/cimgui-go v0.0.0-20240424153022-294abe7370df // indirect
+	github.com/AllenDang/cimgui-go v0.0.0-20240711055741-4b4d3ac1ee30 // indirect
 	github.com/AllenDang/go-findfont v0.0.0-20200702051237-9f180485aeb8 // indirect
 	github.com/alecthomas/units v0.0.0-20240626203959-61d1e3462e30 // indirect
 	github.com/faiface/mainthread v0.0.0-20171120011319-8b78f0a41ae3 // indirect
 	github.com/google/go-github/v30 v30.1.0 // indirect
 	github.com/google/go-querystring v1.1.0 // indirect
 	github.com/inconshreveable/go-update v0.0.0-20160112193335-8152e7eb6ccf // indirect
-	github.com/mazznoer/csscolorparser v0.1.3 // indirect
+	github.com/mazznoer/csscolorparser v0.1.4 // indirect
 	github.com/napsy/go-css v0.0.0-20230611142900-9dd118f3874c // indirect
+	github.com/onsi/gomega v1.34.0 // indirect
 	github.com/pkg/browser v0.0.0-20240102092130-5ac0b6a4141c // indirect
 	github.com/sahilm/fuzzy v0.1.1 // indirect
 	github.com/tcnksm/go-gitconfig v0.1.2 // indirect
@@ -30,7 +31,10 @@ require (
 	golang.design/x/mainthread v0.3.0 // indirect
 	golang.org/x/crypto v0.25.0 // indirect
 	golang.org/x/image v0.18.0 // indirect
+	golang.org/x/net v0.27.0 // indirect
 	golang.org/x/oauth2 v0.21.0 // indirect
 	golang.org/x/sys v0.22.0 // indirect
 	gopkg.in/eapache/queue.v1 v1.1.0 // indirect
 )
+
+replace github.com/imdario/mergo => github.com/imdario/mergo v0.3.16
